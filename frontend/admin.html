@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | EventPass</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-page">
+  <nav class="navbar">
+    <a href="index.html" class="logo">EventPass</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <p class="sidebar-title">Admin</p>
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="events">Events<span class="tab-count hidden" id="pending-count"></span></button>
+      <button class="tab-btn" data-tab="users">Users</button>
+      <button class="tab-btn" data-tab="venues">Venues &amp; Categories</button>
+      <button class="tab-btn" data-tab="bookings">Bookings</button>
+      <button class="tab-btn" data-tab="reports">Sales &amp; Attendance</button>
+    </aside>
+
+    <section class="admin-content">
+
+      <!-- OVERVIEW -->
+      <div class="tab" id="tab-overview">
+        <h1>Overview</h1>
+        <div class="stats" id="stats"></div>
+        <div class="two-col">
+          <div class="panel">
+            <h2>Upcoming events</h2>
+            <div id="upcoming-list"></div>
+          </div>
+          <div class="panel">
+            <h2>Recent bookings</h2>
+            <div id="recent-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="tab hidden" id="tab-events">
+        <div class="tab-header">
+          <h1>Events</h1>
+          <button class="btn btn-small" id="add-event-btn">+ Add event</button>
+        </div>
+        <div class="pending-banner hidden" id="pending-banner"></div>
+        <div class="toolbar">
+          <input type="text" id="event-search" placeholder="Search events...">
+          <select id="event-category-filter"><option value="">All categories</option></select>
+          <select id="event-status-filter">
+            <option value="">All statuses</option>
+            <option value="Pending">Pending approval</option>
+            <option value="Active">Active</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="events-table"></table></div>
+      </div>
+
+      <!-- USERS -->
+      <div class="tab hidden" id="tab-users">
+        <div class="tab-header">
+          <h1>Users</h1>
+          <button class="btn btn-small" id="add-organizer-btn">+ Add organizer</button>
+        </div>
+        <div class="toolbar">
+          <input type="text" id="user-search" placeholder="Search by name, email or student ID...">
+          <select id="user-role-filter">
+            <option value="">All roles</option>
+            <option value="Customer">Students</option>
+            <option value="Organizer">Organizers</option>
+            <option value="Admin">Admins</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="users-table"></table></div>
+      </div>
+
+      <!-- VENUES & CATEGORIES -->
+      <div class="tab hidden" id="tab-venues">
+        <div class="tab-header">
+          <h1>Venues</h1>
+          <button class="btn btn-small" id="add-venue-btn">+ Add venue</button>
+        </div>
+        <div class="table-wrap"><table id="venues-table"></table></div>
+
+        <div class="tab-header section-gap">
+          <h1>Categories</h1>
+          <button class="btn btn-small" id="add-category-btn">+ Add category</button>
+        </div>
+        <div class="table-wrap"><table id="categories-table"></table></div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div class="tab hidden" id="tab-bookings">
+        <div class="tab-header"><h1>Bookings</h1></div>
+        <div class="toolbar">
+          <input type="text" id="booking-search" placeholder="Search by student or event...">
+          <select id="booking-status-filter">
+            <option value="">All statuses</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="bookings-table"></table></div>
+      </div>
+
+      <!-- SALES & ATTENDANCE REPORTS -->
+      <div class="tab hidden" id="tab-reports">
+        <div class="tab-header"><h1>Sales &amp; Attendance</h1></div>
+        <div class="toolbar">
+          <select id="report-when">
+            <option value="">All events</option>
+            <option value="upcoming">Upcoming events</option>
+            <option value="past">Past events</option>
+          </select>
+        </div>
+        <div class="stats" id="report-stats"></div>
+        <h2>By event</h2>
+        <div class="table-wrap" style="margin-bottom:28px"><table id="report-events"></table></div>
+        <h2>By category</h2>
+        <div class="table-wrap"><table id="report-categories"></table></div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- Pop-up form used for add / edit / confirm -->
+  <div class="modal-backdrop hidden" id="modal">
+    <div class="modal">
+      <h2 id="modal-title"></h2>
+      <div id="modal-message" class="message"></div>
+      <form id="modal-form" novalidate>
+        <div id="modal-body"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn" id="modal-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <footer>&copy; 2026 EventPass</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

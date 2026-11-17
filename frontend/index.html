@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events | EventPass</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/shop.css">
+</head>
+<body class="page">
+  <nav class="navbar">
+    <a href="index.html" class="logo">EventPass</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <h1>What's happening at WPU</h1>
+      <p>Concerts, games, club events and career events — book your seat in a few clicks.</p>
+      <input type="search" id="search" placeholder="Search events by name...">
+    </section>
+
+    <button class="filter-toggle" id="filter-toggle" aria-expanded="false">
+      <span>Filters <span class="filter-count" id="filter-count"></span></span><span class="chev">▾</span>
+    </button>
+    <section class="filters" id="filters">
+      <div>
+        <label for="category">Category</label>
+        <select id="category"><option value="">All categories</option></select>
+      </div>
+      <div>
+        <label for="venue">Venue</label>
+        <select id="venue"><option value="">All venues</option></select>
+      </div>
+      <div>
+        <label for="date">Date</label>
+        <select id="date">
+          <option value="">Any date</option>
+          <option value="today">Today</option>
+          <option value="week">Next 7 days</option>
+          <option value="month">This month</option>
+          <option value="pick">Pick a date...</option>
+        </select>
+      </div>
+      <div id="pick-date-wrap" class="hidden">
+        <label for="pick-date">On</label>
+        <input type="date" id="pick-date">
+      </div>
+      <div>
+        <label>Price ($)</label>
+        <div class="price-range">
+          <input type="number" id="price-min" min="0" placeholder="Min">
+          <span>–</span>
+          <input type="number" id="price-max" min="0" placeholder="Max">
+        </div>
+      </div>
+      <div>
+        <label class="check-filter"><input type="checkbox" id="free-only"> Free events only</label>
+      </div>
+      <div>
+        <button class="clear-btn" id="clear">Clear filters</button>
+      </div>
+    </section>
+
+    <div class="results-bar">
+      <span id="result-count"></span>
+      <span>Sorted by date</span>
+    </div>
+    <div class="event-grid" id="event-grid"></div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <footer>&copy; 2026 EventPass · William Paterson University</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/browse.js"></script>
+</body>
+</html>

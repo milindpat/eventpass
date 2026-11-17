@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | EventPass</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="logo">EventPass</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <main>
+    <div class="card">
+      <h1>Create an account</h1>
+      <p class="subtitle">EventPass is the ticket site for William Paterson University events.</p>
+
+      <div id="message" class="message"></div>
+
+      <form id="register-form" novalidate>
+        <div class="form-group">
+          <label>I am a</label>
+          <div class="role-picker">
+            <label class="role-option">
+              <input type="radio" name="role" value="Customer" checked>
+              <span><strong>WPU student</strong><br><small>Book tickets to campus events</small></span>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="role" value="Organizer">
+              <span><strong>Event organizer</strong><br><small>Host events on campus</small></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First name</label>
+            <input type="text" id="firstName">
+            <div class="field-error" id="firstName-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last name</label>
+            <input type="text" id="lastName">
+            <div class="field-error" id="lastName-error"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email" id="email-label">WPU student email</label>
+          <input type="email" id="email" placeholder="lastnamef@student.wpunj.edu">
+          <div class="field-error" id="email-error"></div>
+        </div>
+
+        <div class="form-group" id="studentId-group">
+          <label for="studentId">WPU student ID</label>
+          <input type="text" id="studentId" inputmode="numeric" placeholder="855XXXXXX" maxlength="9">
+          <div class="field-error" id="studentId-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" placeholder="973-555-0123">
+          <div class="field-error" id="phone-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="At least 8 characters">
+          <div class="field-error" id="password-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword">
+          <div class="field-error" id="confirmPassword-error"></div>
+        </div>
+
+        <p class="note" id="organizer-note" style="display:none">
+          New events you create are reviewed by a WPU admin before students can see them.
+        </p>
+
+        <button type="submit" class="btn" id="register-btn">Create Account</button>
+      </form>
+
+      <p class="switch-link">Already have an account? <a href="login.html">Log in</a></p>
+    </div>
+  </main>
+
+  <footer>&copy; 2026 EventPass</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById("register-form");
+    const message = document.getElementById("message");
+    const registerBtn = document.getElementById("register-btn");
+
+    if (getCurrentUser()) goHome(getCurrentUser());
+
+    function value(id) { return document.getElementById(id).value.trim(); }
+    function role() { return document.querySelector('input[name="role"]:checked').value; }
+    function isStudent() { return role() === "Customer"; }
+
+    function setError(id, text) {
+      document.getElementById(id + "-error").textContent = text;
+      document.getElementById(id).classList.toggle("invalid", !!text);
+    }
+
+    // Students need a WPU email + student ID; organizers can use any email
+    function updateForRole() {
+      document.getElementById("studentId-group").style.display = isStudent() ? "block" : "none";
+      document.getElementById("organizer-note").style.display = isStudent() ? "none" : "block";
+      document.getElementById("email-label").textContent = isStudent() ? "WPU student email" : "Email";
+      document.getElementById("email").placeholder = isStudent() ? "lastnamef@student.wpunj.edu" : "you@example.com";
+      ["email", "studentId"].forEach(f => setError(f, ""));
+    }
+    document.querySelectorAll('input[name="role"]').forEach(r => r.addEventListener("change", updateForRole));
+    updateForRole();
+
+    function validate() {
+      const fields = ["firstName", "lastName", "email", "studentId", "phone", "password", "confirmPassword"];
+      fields.forEach(f => setError(f, ""));
+      let valid = true;
+
+      if (!value("firstName")) { setError("firstName", "Required."); valid = false; }
+      if (!value("lastName")) { setError("lastName", "Required."); valid = false; }
+
+      const email = value("email");
+      if (!email) { setError("email", "Email is required."); valid = false; }
+      else if (!/^\S+@\S+\.\S+$/.test(email)) { setError("email", "Enter a valid email."); valid = false; }
+      else if (isStudent() && !/^[^\s@]+@student\.wpunj\.edu$/i.test(email)) {
+        setError("email", "Use your WPU student email (@student.wpunj.edu)."); valid = false;
+      }
+
+      if (isStudent()) {
+        const studentId = value("studentId");
+        if (!studentId) { setError("studentId", "Student ID is required."); valid = false; }
+        else if (!/^855\d{6}$/.test(studentId)) { setError("studentId", "Enter your 9-digit WPU ID starting with 855."); valid = false; }
+      }
+
+      const phone = value("phone");
+      if (!phone) { setError("phone", "Phone is required."); valid = false; }
+      else if (phone.replace(/\D/g, "").length !== 10) { setError("phone", "Enter a 10-digit phone number."); valid = false; }
+
+      const password = document.getElementById("password").value;
+      if (password.length < 8) { setError("password", "Password must be at least 8 characters."); valid = false; }
+
+      if (document.getElementById("confirmPassword").value !== password) {
+        setError("confirmPassword", "Passwords do not match."); valid = false;
+      }
+      return valid;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      registerBtn.disabled = true;
+      registerBtn.textContent = "Creating account...";
+
+      try {
+        await registerUser({
+          FirstName: value("firstName"),
+          LastName: value("lastName"),
+          Email: value("email"),
+          StudentID: isStudent() ? value("studentId") : null,
+          Phone: value("phone"),
+          Role: role(),
+          Password: document.getElementById("password").value
+        });
+        window.location.href = "login.html?registered=1";
+      } catch (err) {
+        showMessage(message, err.message, "error");
+        registerBtn.disabled = false;
+        registerBtn.textContent = "Create Account";
+      }
+    });
+  </script>
+</body>
+</html>

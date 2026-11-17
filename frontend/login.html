@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In | EventPass</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="logo">EventPass</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <main>
+    <div class="card">
+      <h1>Welcome back</h1>
+      <p class="subtitle">Log in to book tickets and manage your events.</p>
+
+      <div id="message" class="message"></div>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@student.wpunj.edu">
+          <div class="field-error" id="email-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Your password">
+          <div class="field-error" id="password-error"></div>
+        </div>
+
+        <button type="submit" class="btn" id="login-btn">Log In</button>
+      </form>
+
+      <p class="switch-link">Don't have an account? <a href="register.html">Sign up</a></p>
+
+      <div class="demo-box">
+        <strong>Test accounts (fake data):</strong><br>
+        Student: doej@student.wpunj.edu / jane1234<br>
+        Organizer: lopezm@wpunj.edu / staff123<br>
+        Admin: admin@wpunj.edu / admin123
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; 2026 EventPass</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById("login-form");
+    const message = document.getElementById("message");
+    const loginBtn = document.getElementById("login-btn");
+
+    // Already logged in? Go home.
+    if (getCurrentUser()) goHome(getCurrentUser());
+
+    // Show success message after registering
+    if (new URLSearchParams(window.location.search).get("registered")) {
+      showMessage(message, "Account created! Please log in.", "success");
+    }
+
+    function setError(id, text) {
+      document.getElementById(id + "-error").textContent = text;
+      document.getElementById(id).classList.toggle("invalid", !!text);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      let valid = true;
+      setError("email", "");
+      setError("password", "");
+
+      if (!email) { setError("email", "Email is required."); valid = false; }
+      else if (!/^\S+@\S+\.\S+$/.test(email)) { setError("email", "Enter a valid email."); valid = false; }
+      if (!password) { setError("password", "Password is required."); valid = false; }
+      if (!valid) return;
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Logging in...";
+
+      try {
+        const user = await loginUser(email, password);
+        setCurrentUser(user);
+        goHome(user);
+      } catch (err) {
+        showMessage(message, err.message, "error");
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Log In";
+      }
+    });
+  </script>
+</body>
+</html>

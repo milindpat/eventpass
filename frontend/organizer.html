@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizer Dashboard | EventPass</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-page">
+  <nav class="navbar">
+    <a href="index.html" class="logo">EventPass</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <p class="sidebar-title">Organizer</p>
+      <button class="tab-btn active" data-tab="events">My Events</button>
+      <button class="tab-btn" data-tab="attendees">Attendees &amp; Check-in</button>
+      <button class="tab-btn" data-tab="sales">Sales</button>
+    </aside>
+
+    <section class="admin-content">
+
+      <!-- MY EVENTS -->
+      <div class="tab" id="tab-events">
+        <div class="tab-header">
+          <h1 id="welcome">My Events</h1>
+          <button class="btn btn-small" id="add-event-btn">+ Create event</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="pending-banner hidden" id="pending-banner"></div>
+        <div class="toolbar">
+          <input type="text" id="event-search" placeholder="Search my events...">
+          <select id="event-time-filter">
+            <option value="upcoming">Upcoming</option>
+            <option value="past">Past</option>
+            <option value="">All dates</option>
+          </select>
+          <select id="event-status-filter">
+            <option value="">All statuses</option>
+            <option value="Pending">Waiting for approval</option>
+            <option value="Active">Active</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="events-table"></table></div>
+      </div>
+
+      <!-- ATTENDEES -->
+      <div class="tab hidden" id="tab-attendees">
+        <div class="tab-header"><h1>Attendees &amp; Check-in</h1></div>
+        <div class="toolbar">
+          <select id="attendee-event-filter"></select>
+          <input type="text" id="attendee-search" placeholder="Search by name, email or student ID...">
+        </div>
+        <p class="list-sub" id="attendee-summary" style="margin-bottom:10px"></p>
+        <div class="table-wrap"><table id="attendees-table"></table></div>
+      </div>
+
+      <!-- SALES -->
+      <div class="tab hidden" id="tab-sales">
+        <div class="tab-header"><h1>Sales</h1></div>
+        <div class="toolbar">
+          <select id="sales-when">
+            <option value="">All my events</option>
+            <option value="upcoming">Upcoming events</option>
+            <option value="past">Past events</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="sales-table"></table></div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- Pop-up form used for add / edit / confirm -->
+  <div class="modal-backdrop hidden" id="modal">
+    <div class="modal">
+      <h2 id="modal-title"></h2>
+      <div id="modal-message" class="message"></div>
+      <form id="modal-form" novalidate>
+        <div id="modal-body"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn" id="modal-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <footer>&copy; 2026 EventPass</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/organizer.js"></script>
+</body>
+</html>

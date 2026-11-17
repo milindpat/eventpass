@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings | EventPass</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/shop.css">
+</head>
+<body class="page">
+  <nav class="navbar">
+    <a href="index.html" class="logo">EventPass</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <main>
+    <h1>My bookings</h1>
+    <p class="page-sub">Your tickets for upcoming and past WPU events.</p>
+    <div class="tabs">
+      <button class="active" data-view="upcoming">Upcoming</button>
+      <button data-view="past">Past</button>
+      <button data-view="cancelled">Cancelled</button>
+    </div>
+    <div id="booking-list"></div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <footer>&copy; 2026 EventPass · William Paterson University</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/my-bookings.js"></script>
+</body>
+</html>

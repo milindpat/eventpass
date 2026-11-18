@@ -31,3 +31,5 @@ which endpoints the front end calls.
 2. Make a branch for your work: `git checkout -b your-feature`
 3. Commit often with clear messages
 4. Push the branch and open a **Pull Request** into `main`
+
+Questions about the front end? Contact Semih Aksehirli.

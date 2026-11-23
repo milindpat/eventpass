@@ -45,3 +45,18 @@ The read-only API also provides `/api/health`, `/api/categories`,
 `/api/venues`, and `/api/tickettypes`. Events and ticket types are limited
 to approved events. The frontend demo should keep `USE_MOCK = true`
 while authentication, booking, and dashboard endpoints are in development.
+
+## Test authentication
+
+Restart the API to migrate an existing catalog database to schema version 2.
+The migration preserves catalog rows and converts the original reserved demo
+inventory into demo tickets. It creates the user, booking, ticket and cart
+tables plus an internal session table. Placeholder catalog owners have no login.
+
+- `POST /api/register` accepts `FirstName`, `LastName`, `Email`, `StudentID`, `Phone`, `Role` and `Password`. The allowed signup roles are `Customer` and `Organizer`.
+- `POST /api/login` accepts `Email` and `Password` and returns the user profile and an eight-hour bearer token.
+- `GET /api/me` returns the current profile with an `Authorization: Bearer <token>` header.
+- `POST /api/logout` revokes the supplied token.
+
+Keep the browser demo in mock mode until frontend integration. The API uses
+the frontend's field names. The catalog seed remains a small demo fixture.

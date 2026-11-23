@@ -33,3 +33,15 @@ which endpoints the front end calls.
 4. Push the branch and open a **Pull Request** into `main`
 
 Questions about the front end? Contact Semih Aksehirli.
+
+## Run the catalog API
+
+With Node.js 24, run `node backend/server.mjs` from the repository root.
+The server creates and seeds `backend/eventpass.sqlite` on the first run.
+Set `EVENTPASS_DB` to use a different database file or `PORT` to change the port.
+
+Open http://127.0.0.1:3000/api/events to see the demo events.
+The read-only API also provides `/api/health`, `/api/categories`,
+`/api/venues`, and `/api/tickettypes`. Events and ticket types are limited
+to approved events. The frontend demo should keep `USE_MOCK = true`
+while authentication, booking, and dashboard endpoints are in development.

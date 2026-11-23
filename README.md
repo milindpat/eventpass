@@ -73,3 +73,35 @@ You can cancel an upcoming booking and release its seats.
 The cart is still stored in the browser. The live student demo supports free
 bookings. The separate Live Server mock demo still includes the organizer and
 admin screens.
+
+## Organizer submission and admin approval API
+
+Register separate organizer and admin test accounts as `Organizer` using
+`POST /api/register`. From the repository root, promote only the intended
+admin account with `node backend/promote-admin.mjs <email>`. Log in separately
+with each account to get its bearer token. The promotion script uses the same
+default database path as the server and respects `EVENTPASS_DB`.
+
+| Method and endpoint | Role | Purpose |
+| --- | --- | --- |
+| `GET /api/organizer/events` | Organizer | List your own events |
+| `POST /api/organizer/events` | Organizer | Submit an event and its ticket types as pending |
+| `GET /api/admin/events/pending` | Admin | List submissions awaiting approval |
+| `POST /api/admin/events/{id}/approve` | Admin | Approve a pending event |
+
+For submission, send JSON such as:
+
+```json
+{
+  "Title": "Campus Volunteer Fair",
+  "Description": "Meet campus volunteer organizations.",
+  "VenueID": 2,
+  "CategoryID": 4,
+  "EventDate": "2026-12-15",
+  "StartTime": "14:00",
+  "TicketTypes": [{ "Name": "Student", "PriceCents": 0, "QuantityTotal": 30 }]
+}
+```
+
+The public catalog and student pages display the event and its ticket types
+once approved. Organizer and admin dashboard screens still use mock data.

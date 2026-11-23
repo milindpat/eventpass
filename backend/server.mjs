@@ -5,6 +5,7 @@ import { DatabaseSync } from "node:sqlite";
 
 import { createAuth, readJson, RequestError } from "./auth.mjs";
 
+import { createEventApproval } from "./event-approval.mjs";
 import { createStudentApi } from "./student.mjs";
 
 const databasePath = process.env.EVENTPASS_DB ??
@@ -49,13 +50,28 @@ const routes = new Map([
 const auth = createAuth(db);
 const student = createStudentApi(db, routes);
 const customer = request => auth.authenticate(request, ["Customer"]).user;
+const approval = createEventApproval(db);
+const organizer = request => auth.authenticate(request, ["Organizer"]).user;
+function admin(request) {
+  auth.authenticate(request, ["Admin"]);
+}
 const authRoutes = new Map([
-  ["/api/student", ["GET", 200, request => student.snapshot(customer(request))]],
-  ["/api/bookings", ["POST", 201, async request => student.book(customer(request), await readJson(request))]],
-  ["/api/register", ["POST", 201, async request => auth.register(await readJson(request))]],
-  ["/api/login", ["POST", 200, async request => auth.login(await readJson(request))]],
-  ["/api/me", ["GET", 200, request => auth.authenticate(request).user]],
-  ["/api/logout", ["POST", 200, request => auth.logout(request)]]
+  ["/api/organizer/events", {
+    GET: [200, request => approval.mine(organizer(request).UserID)],
+    POST: [201, async request => approval.submit(organizer(request), await readJson(request))]
+  }],
+  ["/api/admin/events/pending", {
+    GET: [200, request => {
+      admin(request);
+      return approval.pending();
+    }]
+  }],
+  ["/api/student", { GET: [200, request => student.snapshot(customer(request))] }],
+  ["/api/bookings", { POST: [201, async request => student.book(customer(request), await readJson(request))] }],
+  ["/api/register", { POST: [201, async request => auth.register(await readJson(request))] }],
+  ["/api/login", { POST: [200, async request => auth.login(await readJson(request))] }],
+  ["/api/me", { GET: [200, request => auth.authenticate(request).user] }],
+  ["/api/logout", { POST: [200, request => auth.logout(request)] }]
 ]);
 
 function sendJson(response, status, body) {
@@ -83,17 +99,24 @@ const server = createServer(async (request, response) => {
   const path = request.url.split("?", 1)[0];
   if (request.method === "GET" && serveStudentPage(path, response)) return;
   const cancel = path.match(/^\/api\/bookings\/(\d+)\/cancel$/);
-  const authRoute = cancel
-    ? ["POST", 200, req => student.cancel(customer(req), Number(cancel[1]))]
-    : authRoutes.get(path);
-  if (authRoute) {
-    const [method, status, handler] = authRoute;
+  const approvalPath = path.match(/^\/api\/admin\/events\/(\d+)\/approve$/);
+  const handlers = cancel
+    ? { POST: [200, req => student.cancel(customer(req), Number(cancel[1]))] }
+    : approvalPath
+      ? { POST: [200, req => {
+        admin(req);
+        return approval.approve(Number(approvalPath[1]));
+      }] }
+      : authRoutes.get(path);
+  if (handlers) {
     response.setHeader("Cache-Control", "no-store");
-    if (request.method !== method) {
-      response.setHeader("Allow", method);
-      sendJson(response, 405, { message: `Use ${method} for this endpoint.` });
+    if (!Object.hasOwn(handlers, request.method)) {
+      const allowed = Object.keys(handlers).join(", ");
+      response.setHeader("Allow", allowed);
+      sendJson(response, 405, { message: `Allowed methods: ${allowed}.` });
       return;
     }
+    const [status, handler] = handlers[request.method];
     try {
       sendJson(response, status, await handler(request));
     } catch (error) {

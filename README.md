@@ -60,3 +60,16 @@ tables plus an internal session table. Placeholder catalog owners have no login.
 
 Keep the browser demo in mock mode until frontend integration. The API uses
 the frontend's field names. The catalog seed remains a small demo fixture.
+
+## Live student demo
+
+Run `node backend/server.mjs` and open
+[Student login](http://127.0.0.1:3000/student/login.html). Use the student
+account registered against the API or sign up through this page. Open
+**Winter Career Fair**, add a free ticket, and confirm checkout. The booking
+and ticket code are saved to SQLite and appear in My Bookings after refresh.
+You can cancel an upcoming booking and release its seats.
+
+The cart is still stored in the browser. The live student demo supports free
+bookings. The separate Live Server mock demo still includes the organizer and
+admin screens.

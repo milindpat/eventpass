@@ -5,6 +5,8 @@ import { DatabaseSync } from "node:sqlite";
 
 import { createAuth, readJson, RequestError } from "./auth.mjs";
 
+import { createStudentApi } from "./student.mjs";
+
 const databasePath = process.env.EVENTPASS_DB ??
   fileURLToPath(new URL("./eventpass.sqlite", import.meta.url));
 const db = new DatabaseSync(databasePath);
@@ -45,7 +47,11 @@ const routes = new Map([
 ]);
 
 const auth = createAuth(db);
+const student = createStudentApi(db, routes);
+const customer = request => auth.authenticate(request, ["Customer"]).user;
 const authRoutes = new Map([
+  ["/api/student", ["GET", 200, request => student.snapshot(customer(request))]],
+  ["/api/bookings", ["POST", 201, async request => student.book(customer(request), await readJson(request))]],
   ["/api/register", ["POST", 201, async request => auth.register(await readJson(request))]],
   ["/api/login", ["POST", 200, async request => auth.login(await readJson(request))]],
   ["/api/me", ["GET", 200, request => auth.authenticate(request).user]],
@@ -57,9 +63,29 @@ function sendJson(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
+const frontendTypes = { html: "text/html", js: "text/javascript", css: "text/css" };
+function serveStudentPage(path, response) {
+  const match = path.match(/^\/student\/((?:login|register|index|event|cart|checkout|booking|my-bookings)\.html|(?:js|css)\/[a-z-]+\.(?:js|css))$/);
+  if (!match) return false;
+  const file = match[1];
+  try {
+    const body = readFileSync(new URL("../frontend/" + file, import.meta.url));
+    response.writeHead(200, { "Content-Type": frontendTypes[file.split(".").pop()] + "; charset=utf-8" });
+    response.end(body);
+  } catch (error) {
+    if (error.code !== "ENOENT") console.error(error);
+    sendJson(response, error.code === "ENOENT" ? 404 : 500, { message: "Page unavailable." });
+  }
+  return true;
+}
+
 const server = createServer(async (request, response) => {
   const path = request.url.split("?", 1)[0];
-  const authRoute = authRoutes.get(path);
+  if (request.method === "GET" && serveStudentPage(path, response)) return;
+  const cancel = path.match(/^\/api\/bookings\/(\d+)\/cancel$/);
+  const authRoute = cancel
+    ? ["POST", 200, req => student.cancel(customer(req), Number(cancel[1]))]
+    : authRoutes.get(path);
   if (authRoute) {
     const [method, status, handler] = authRoute;
     response.setHeader("Cache-Control", "no-store");
